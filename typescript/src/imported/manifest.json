@@ -1,0 +1,1195 @@
+{
+  "version": "1.0",
+  "namespace": "posthog",
+  "tools": [
+    {
+      "name": "get_event_trend",
+      "description": "Fetch time-series metrics (totals, unique users, DAU, MAU, percentiles) for a given event over time.",
+      "parameters": {
+        "project_id": "number",
+        "event": "string",
+        "math": "string (optional, e.g. total, unique_users, dau, p90)",
+        "interval": "string (optional, day|week|month)",
+        "days": "number (optional, default 7)",
+        "smoothing": "number (optional, 7 or 28 for rolling averages)"
+      }
+    },
+    {
+      "name": "get_event_trend_breakdown",
+      "description": "Fetch event trend segmented by up to 3 property or cohort breakdowns.",
+      "parameters": {
+        "project_id": "number",
+        "event": "string",
+        "breakdowns": "array of strings (property keys)",
+        "math": "string (optional)",
+        "interval": "string (optional)",
+        "days": "number (optional)"
+      }
+    },
+    {
+      "name": "get_filtered_trend",
+      "description": "Fetch event trend filtered by properties, cohorts, or feature flags.",
+      "parameters": {
+        "project_id": "number",
+        "event": "string",
+        "filters": "object (optional property/cohort filters)",
+        "math": "string (optional)",
+        "interval": "string (optional)",
+        "days": "number (optional)"
+      }
+    },
+    {
+      "name": "get_cumulative_metric",
+      "description": "Fetch cumulative totals or rolling averages for a given event.",
+      "parameters": {
+        "project_id": "number",
+        "event": "string",
+        "math": "string (optional)",
+        "days": "number (optional, default 30)"
+      }
+    },
+    {
+      "name": "get_funnel_conversion",
+      "description": "Fetch step-by-step conversion metrics for a funnel.",
+      "parameters": {
+        "project_id": "number",
+        "funnel_id": "number"
+      }
+    },
+    {
+      "name": "get_retention_report",
+      "description": "Fetch cohort-based retention metrics (daily/weekly/monthly).",
+      "parameters": {
+        "project_id": "number",
+        "date_from": "string (optional, e.g. -30d)",
+        "period": "string (optional, day|week|month)"
+      }
+    },
+    {
+      "name": "get_user_paths",
+      "description": "Fetch user flow data (nodes and links between events).",
+      "parameters": {
+        "project_id": "number",
+        "date_from": "string (optional, e.g. -7d)"
+      }
+    },
+    {
+      "name": "run_hogql_query",
+      "description": "Execute a raw HogQL (PostHog SQL) query for advanced analytics.",
+      "parameters": {
+        "project_id": "number",
+        "query": "string (HogQL query)"
+      }
+    },
+    {
+      "name": "list_events",
+      "description": "List recent events (deprecated API, for debugging only).",
+      "parameters": {
+        "project_id": "number",
+        "limit": "number (optional)",
+        "before": "string (optional timestamp)",
+        "after": "string (optional timestamp)",
+        "properties": "object (optional filters)"
+      }
+    },
+    {
+      "name": "get_persons",
+      "description": "List or search persons (users) in the project.",
+      "parameters": {
+        "project_id": "number",
+        "limit": "number (optional)",
+        "properties": "object (optional property filters)",
+        "cohort": "number (optional cohort ID)"
+      }
+    },
+    {
+      "name": "get_person_activity",
+      "description": "Fetch a person's recent event timeline.",
+      "parameters": {
+        "project_id": "number",
+        "person_id": "string"
+      }
+    },
+    {
+      "name": "get_person_stickiness",
+      "description": "Fetch stickiness metrics (repeat user engagement).",
+      "parameters": {
+        "project_id": "number",
+        "date_from": "string (optional)",
+        "interval": "string (optional, day|week|month)"
+      }
+    },
+    {
+      "name": "get_person_trends",
+      "description": "Fetch per-user trend summaries (counts, activity).",
+      "parameters": {
+        "project_id": "number",
+        "date_from": "string (optional)",
+        "interval": "string (optional)",
+        "filters": "object (optional)"
+      }
+    },
+    {
+      "name": "evaluate_flags",
+      "description": "Evaluate feature flags for a given user and groups.",
+      "parameters": {
+        "project_id": "number",
+        "distinct_id": "string",
+        "groups": "object (optional)"
+      }
+    },
+    {
+      "name": "list_feature_flags",
+      "description": "List all feature flags for a project.",
+      "parameters": {
+        "project_id": "number"
+      }
+    },
+    {
+      "name": "list_surveys",
+      "description": "List all surveys in a project.",
+      "parameters": {
+        "project_id": "number"
+      }
+    },
+    {
+      "name": "get_survey",
+      "description": "Fetch details for a survey by ID.",
+      "parameters": {
+        "project_id": "number",
+        "survey_id": "number"
+      }
+    },
+    {
+      "name": "get_survey_stats",
+      "description": "Fetch survey stats (responses, summary).",
+      "parameters": {
+        "project_id": "number",
+        "survey_id": "number"
+      }
+    },
+    {
+      "name": "list_projects",
+      "description": "List all projects in an organization.",
+      "parameters": {
+        "organization_id": "string"
+      }
+    },
+    {
+      "name": "get_project",
+      "description": "Fetch project settings and details.",
+      "parameters": {
+        "project_id": "number"
+      }
+    },
+    {
+      "name": "update_project",
+      "description": "Update project configuration (tokens, settings, onboarding states).",
+      "parameters": {
+        "project_id": "number",
+        "payload": "object (settings to update)"
+      }
+    },
+    {
+      "name": "export_insight_data",
+      "description": "Export data for an insight as JSON or CSV.",
+      "parameters": {
+        "project_id": "number",
+        "insight_id": "number",
+        "format": "string (json|csv)"
+      }
+    },
+    {
+      "name": "schedule_insight_delivery",
+      "description": "Schedule regular delivery of an insight via email or Slack.",
+      "parameters": {
+        "project_id": "number",
+        "insight_id": "number",
+        "destination": "string (email|slack)",
+        "target": "string (email address or Slack channel ID)"
+      }
+    },
+    {
+      "name": "get_all_persons",
+      "description": "List all persons (users) in the project with filtering and pagination.",
+      "parameters": {
+        "project_id": "number",
+        "limit": "number (optional, default 100)",
+        "offset": "number (optional)",
+        "properties": "object (optional property filters)",
+        "cohort": "number (optional cohort ID)",
+        "search": "string (optional search term)",
+        "format": "string (optional, json|csv)"
+      }
+    },
+    {
+      "name": "get_person",
+      "description": "Get a specific person by their distinct_id.",
+      "parameters": {
+        "project_id": "number",
+        "person_id": "string",
+        "format": "string (optional, json|csv)"
+      }
+    },
+    {
+      "name": "create_person",
+      "description": "Create a new person with distinct_id and properties.",
+      "parameters": {
+        "project_id": "number",
+        "distinct_id": "string",
+        "properties": "object (optional person properties)",
+        "$set": "object (optional set properties)",
+        "$set_once": "object (optional set properties only if not set)"
+      }
+    },
+    {
+      "name": "update_person",
+      "description": "Update a person's properties by their distinct_id.",
+      "parameters": {
+        "project_id": "number",
+        "person_id": "string",
+        "properties": "object (person properties to update)",
+        "$set": "object (optional set properties)",
+        "$set_once": "object (optional set properties only if not set)"
+      }
+    },
+    {
+      "name": "delete_person",
+      "description": "Delete a person by their distinct_id.",
+      "parameters": {
+        "project_id": "number",
+        "person_id": "string"
+      }
+    },
+    {
+      "name": "get_person_activity",
+      "description": "Get a person's recent activity timeline.",
+      "parameters": {
+        "project_id": "number",
+        "person_id": "string",
+        "limit": "number (optional)",
+        "before": "string (optional timestamp)",
+        "after": "string (optional timestamp)"
+      }
+    },
+    {
+      "name": "get_person_stickiness",
+      "description": "Get stickiness metrics for persons (repeat user engagement).",
+      "parameters": {
+        "project_id": "number",
+        "date_from": "string (optional, e.g. -30d)",
+        "interval": "string (optional, day|week|month)",
+        "properties": "object (optional property filters)"
+      }
+    },
+    {
+      "name": "get_person_trends",
+      "description": "Get per-user trend summaries (counts, activity).",
+      "parameters": {
+        "project_id": "number",
+        "date_from": "string (optional, e.g. -30d)",
+        "interval": "string (optional, day|week|month)",
+        "filters": "object (optional additional filters)"
+      }
+    },
+    {
+      "name": "get_all_cohorts",
+      "description": "List all cohorts in the project with pagination.",
+      "parameters": {
+        "project_id": "number",
+        "limit": "number (optional, default 100)",
+        "offset": "number (optional)"
+      }
+    },
+    {
+      "name": "get_cohort",
+      "description": "Get a specific cohort by ID.",
+      "parameters": {
+        "project_id": "number",
+        "cohort_id": "number"
+      }
+    },
+    {
+      "name": "create_cohort",
+      "description": "Create a new cohort with name, filters, and properties.",
+      "parameters": {
+        "project_id": "number",
+        "name": "string",
+        "groups": "array of objects (cohort filter groups)",
+        "description": "string (optional)",
+        "is_static": "boolean (optional)",
+        "tags": "array of strings (optional)"
+      }
+    },
+    {
+      "name": "update_cohort",
+      "description": "Update a cohort's properties by ID.",
+      "parameters": {
+        "project_id": "number",
+        "cohort_id": "number",
+        "name": "string (optional)",
+        "groups": "array of objects (optional)",
+        "description": "string (optional)",
+        "is_static": "boolean (optional)",
+        "tags": "array of strings (optional)"
+      }
+    },
+    {
+      "name": "delete_cohort",
+      "description": "Delete a cohort by ID.",
+      "parameters": {
+        "project_id": "number",
+        "cohort_id": "number"
+      }
+    },
+    {
+      "name": "get_cohort_persons",
+      "description": "Get all persons (users) in a specific cohort.",
+      "parameters": {
+        "project_id": "number",
+        "cohort_id": "number",
+        "limit": "number (optional)",
+        "offset": "number (optional)"
+      }
+    },
+    {
+      "name": "duplicate_cohort",
+      "description": "Duplicate an existing cohort with a new name.",
+      "parameters": {
+        "project_id": "number",
+        "cohort_id": "number",
+        "name": "string",
+        "description": "string (optional)"
+      }
+    },
+    {
+      "name": "get_all_experiments",
+      "description": "List all experiments in the project with pagination.",
+      "parameters": {
+        "project_id": "number",
+        "limit": "number (optional, default 100)",
+        "offset": "number (optional)"
+      }
+    },
+    {
+      "name": "get_experiment",
+      "description": "Get a specific experiment by ID.",
+      "parameters": {
+        "project_id": "number",
+        "experiment_id": "number"
+      }
+    },
+    {
+      "name": "create_experiment",
+      "description": "Create a new A/B test experiment.",
+      "parameters": {
+        "project_id": "number",
+        "name": "string",
+        "description": "string (optional)",
+        "feature_flag_key": "string",
+        "parameters": "object (optional experiment parameters)",
+        "start_date": "string (optional, ISO format)",
+        "end_date": "string (optional, ISO format)",
+        "secondary_metrics": "array of strings (optional)",
+        "exposure_cohort_id": "number (optional)"
+      }
+    },
+    {
+      "name": "update_experiment",
+      "description": "Update an experiment's properties by ID.",
+      "parameters": {
+        "project_id": "number",
+        "experiment_id": "number",
+        "name": "string (optional)",
+        "description": "string (optional)",
+        "feature_flag_key": "string (optional)",
+        "parameters": "object (optional)",
+        "start_date": "string (optional)",
+        "end_date": "string (optional)",
+        "secondary_metrics": "array of strings (optional)",
+        "exposure_cohort_id": "number (optional)"
+      }
+    },
+    {
+      "name": "delete_experiment",
+      "description": "Delete an experiment by ID.",
+      "parameters": {
+        "project_id": "number",
+        "experiment_id": "number"
+      }
+    },
+    {
+      "name": "duplicate_experiment",
+      "description": "Duplicate an existing experiment with a new name and feature flag.",
+      "parameters": {
+        "project_id": "number",
+        "experiment_id": "number",
+        "name": "string",
+        "feature_flag_key": "string"
+      }
+    },
+    {
+      "name": "create_exposure_cohort",
+      "description": "Create an exposure cohort for an experiment.",
+      "parameters": {
+        "project_id": "number",
+        "experiment_id": "number",
+        "name": "string",
+        "feature_flag_key": "string"
+      }
+    },
+    {
+      "name": "get_experiments_requiring_flag",
+      "description": "Get experiments that require flag implementation.",
+      "parameters": {
+        "project_id": "number"
+      }
+    },
+    {
+      "name": "get_all_surveys",
+      "description": "List all surveys in the project with pagination.",
+      "parameters": {
+        "project_id": "number",
+        "limit": "number (optional, default 100)",
+        "offset": "number (optional)"
+      }
+    },
+    {
+      "name": "get_survey",
+      "description": "Get a specific survey by ID.",
+      "parameters": {
+        "project_id": "number",
+        "survey_id": "number"
+      }
+    },
+    {
+      "name": "create_survey",
+      "description": "Create a new survey with questions and settings.",
+      "parameters": {
+        "project_id": "number",
+        "name": "string",
+        "description": "string (optional)",
+        "type": "string (popover|button|full_screen|api)",
+        "questions": "array of objects (survey questions)",
+        "conditions": "object (optional display conditions)",
+        "appearance": "object (optional appearance settings)",
+        "start_date": "string (optional, ISO format)",
+        "end_date": "string (optional, ISO format)",
+        "linked_flag_id": "number (optional)",
+        "archived": "boolean (optional)"
+      }
+    },
+    {
+      "name": "update_survey",
+      "description": "Update a survey's properties by ID.",
+      "parameters": {
+        "project_id": "number",
+        "survey_id": "number",
+        "name": "string (optional)",
+        "description": "string (optional)",
+        "type": "string (optional)",
+        "questions": "array of objects (optional)",
+        "conditions": "object (optional)",
+        "appearance": "object (optional)",
+        "start_date": "string (optional)",
+        "end_date": "string (optional)",
+        "linked_flag_id": "number (optional)",
+        "archived": "boolean (optional)"
+      }
+    },
+    {
+      "name": "delete_survey",
+      "description": "Delete a survey by ID.",
+      "parameters": {
+        "project_id": "number",
+        "survey_id": "number"
+      }
+    },
+    {
+      "name": "get_survey_responses",
+      "description": "Get all responses for a specific survey.",
+      "parameters": {
+        "project_id": "number",
+        "survey_id": "number",
+        "limit": "number (optional)",
+        "offset": "number (optional)"
+      }
+    },
+    {
+      "name": "get_survey_stats",
+      "description": "Get survey statistics and summary data.",
+      "parameters": {
+        "project_id": "number",
+        "survey_id": "number"
+      }
+    },
+    {
+      "name": "get_all_actions",
+      "description": "List all actions in the project with pagination.",
+      "parameters": {
+        "project_id": "number",
+        "limit": "number (optional, default 100)",
+        "offset": "number (optional)"
+      }
+    },
+    {
+      "name": "get_action",
+      "description": "Get a specific action by ID.",
+      "parameters": {
+        "project_id": "number",
+        "action_id": "number"
+      }
+    },
+    {
+      "name": "create_action",
+      "description": "Create a new action with steps and triggers.",
+      "parameters": {
+        "project_id": "number",
+        "name": "string",
+        "description": "string (optional)",
+        "post_to_slack": "boolean (optional)",
+        "slack_message_format": "string (optional)",
+        "steps": "array of objects (action steps/triggers)",
+        "deleted": "boolean (optional)",
+        "is_calculating": "boolean (optional)",
+        "created_by": "object (optional)",
+        "created_at": "string (optional, ISO format)",
+        "updated_at": "string (optional, ISO format)"
+      }
+    },
+    {
+      "name": "update_action",
+      "description": "Update an action's properties by ID.",
+      "parameters": {
+        "project_id": "number",
+        "action_id": "number",
+        "name": "string (optional)",
+        "description": "string (optional)",
+        "post_to_slack": "boolean (optional)",
+        "slack_message_format": "string (optional)",
+        "steps": "array of objects (optional)",
+        "deleted": "boolean (optional)",
+        "is_calculating": "boolean (optional)"
+      }
+    },
+    {
+      "name": "delete_action",
+      "description": "Delete an action by ID.",
+      "parameters": {
+        "project_id": "number",
+        "action_id": "number"
+      }
+    },
+    {
+      "name": "get_all_session_recordings",
+      "description": "List all session recordings in the project with filtering and pagination.",
+      "parameters": {
+        "project_id": "number",
+        "limit": "number (optional, default 100)",
+        "offset": "number (optional)",
+        "person_id": "string (optional)",
+        "distinct_id": "string (optional)",
+        "date_from": "string (optional, ISO format)",
+        "date_to": "string (optional, ISO format)",
+        "search": "string (optional)",
+        "status": "string (optional, active/archived)"
+      }
+    },
+    {
+      "name": "get_session_recording",
+      "description": "Get a specific session recording by ID.",
+      "parameters": {
+        "project_id": "number",
+        "recording_id": "string"
+      }
+    },
+    {
+      "name": "update_session_recording",
+      "description": "Update a session recording's properties by ID.",
+      "parameters": {
+        "project_id": "number",
+        "recording_id": "string",
+        "bookmarked": "boolean (optional)",
+        "notes": "string (optional)",
+        "status": "string (optional, active/archived)"
+      }
+    },
+    {
+      "name": "delete_session_recording",
+      "description": "Delete a session recording by ID.",
+      "parameters": {
+        "project_id": "number",
+        "recording_id": "string"
+      }
+    },
+    {
+      "name": "get_session_recording_sharing",
+      "description": "Get sharing information for a session recording.",
+      "parameters": {
+        "project_id": "number",
+        "recording_id": "string"
+      }
+    },
+    {
+      "name": "refresh_session_recording_sharing",
+      "description": "Refresh sharing information for a session recording.",
+      "parameters": {
+        "project_id": "number",
+        "recording_id": "string"
+      }
+    },
+    {
+      "name": "get_all_property_definitions",
+      "description": "List all property definitions in the project with filtering and pagination.",
+      "parameters": {
+        "project_id": "number",
+        "limit": "number (optional, default 100)",
+        "offset": "number (optional)",
+        "search": "string (optional)",
+        "property_type": "string (optional, event/person/group)",
+        "group_type_index": "number (optional)"
+      }
+    },
+    {
+      "name": "get_property_definition",
+      "description": "Get a specific property definition by key.",
+      "parameters": {
+        "project_id": "number",
+        "property_key": "string"
+      }
+    },
+    {
+      "name": "create_property_definition",
+      "description": "Create a new property definition.",
+      "parameters": {
+        "project_id": "number",
+        "name": "string",
+        "property_type": "string (event/person/group)",
+        "description": "string (optional)",
+        "group_type_index": "number (optional)",
+        "property_type_format": "string (optional)",
+        "example": "string (optional)",
+        "property_type_definition": "object (optional)",
+        "is_numerical": "boolean (optional)",
+        "is_seen_on_filtered_events": "boolean (optional)",
+        "query_usage_30_day": "number (optional)",
+        "volume_30_day": "number (optional)"
+      }
+    },
+    {
+      "name": "update_property_definition",
+      "description": "Update a property definition's properties by key.",
+      "parameters": {
+        "project_id": "number",
+        "property_key": "string",
+        "name": "string (optional)",
+        "description": "string (optional)",
+        "property_type_format": "string (optional)",
+        "example": "string (optional)",
+        "property_type_definition": "object (optional)",
+        "is_numerical": "boolean (optional)",
+        "is_seen_on_filtered_events": "boolean (optional)"
+      }
+    },
+    {
+      "name": "delete_property_definition",
+      "description": "Delete a property definition by key.",
+      "parameters": {
+        "project_id": "number",
+        "property_key": "string"
+      }
+    },
+    {
+      "name": "get_all_event_definitions",
+      "description": "List all event definitions in the project with filtering and pagination.",
+      "parameters": {
+        "project_id": "number",
+        "limit": "number (optional, default 100)",
+        "offset": "number (optional)",
+        "search": "string (optional)",
+        "event_type": "string (optional, all/autocapture/pageview/custom)"
+      }
+    },
+    {
+      "name": "get_event_definition",
+      "description": "Get a specific event definition by name.",
+      "parameters": {
+        "project_id": "number",
+        "event_name": "string"
+      }
+    },
+    {
+      "name": "create_event_definition",
+      "description": "Create a new event definition.",
+      "parameters": {
+        "project_id": "number",
+        "name": "string",
+        "description": "string (optional)",
+        "query_usage_30_day": "number (optional)",
+        "volume_30_day": "number (optional)",
+        "verified": "boolean (optional)",
+        "owner": "object (optional)",
+        "created_at": "string (optional, ISO format)",
+        "updated_at": "string (optional, ISO format)",
+        "last_seen_at": "string (optional, ISO format)",
+        "last_updated_at": "string (optional, ISO format)"
+      }
+    },
+    {
+      "name": "update_event_definition",
+      "description": "Update an event definition's properties by name.",
+      "parameters": {
+        "project_id": "number",
+        "event_name": "string",
+        "description": "string (optional)",
+        "verified": "boolean (optional)",
+        "owner": "object (optional)"
+      }
+    },
+    {
+      "name": "delete_event_definition",
+      "description": "Delete an event definition by name.",
+      "parameters": {
+        "project_id": "number",
+        "event_name": "string"
+      }
+    },
+    {
+      "name": "get_all_group_types",
+      "description": "List all group types in the project with pagination.",
+      "parameters": {
+        "project_id": "number",
+        "limit": "number (optional, default 100)",
+        "offset": "number (optional)"
+      }
+    },
+    {
+      "name": "get_group_type",
+      "description": "Get a specific group type by index.",
+      "parameters": {
+        "project_id": "number",
+        "group_type_index": "number"
+      }
+    },
+    {
+      "name": "get_all_groups",
+      "description": "List all groups for a specific group type with filtering and pagination.",
+      "parameters": {
+        "project_id": "number",
+        "group_type_index": "number",
+        "limit": "number (optional, default 100)",
+        "offset": "number (optional)",
+        "search": "string (optional)",
+        "group_key": "string (optional)"
+      }
+    },
+    {
+      "name": "get_group",
+      "description": "Get a specific group by type index and key.",
+      "parameters": {
+        "project_id": "number",
+        "group_type_index": "number",
+        "group_key": "string"
+      }
+    },
+    {
+      "name": "create_group",
+      "description": "Create a new group for a specific group type.",
+      "parameters": {
+        "project_id": "number",
+        "group_type_index": "number",
+        "group_key": "string",
+        "group_properties": "object (optional)",
+        "created_at": "string (optional, ISO format)",
+        "updated_at": "string (optional, ISO format)"
+      }
+    },
+    {
+      "name": "update_group",
+      "description": "Update a group's properties by type index and key.",
+      "parameters": {
+        "project_id": "number",
+        "group_type_index": "number",
+        "group_key": "string",
+        "group_properties": "object (optional)"
+      }
+    },
+    {
+      "name": "delete_group",
+      "description": "Delete a group by type index and key.",
+      "parameters": {
+        "project_id": "number",
+        "group_type_index": "number",
+        "group_key": "string"
+      }
+    },
+    {
+      "name": "get_all_members",
+      "description": "List all members in the organization with pagination.",
+      "parameters": {
+        "organization_id": "string (UUID)",
+        "limit": "number (optional, default 100)",
+        "offset": "number (optional)"
+      }
+    },
+    {
+      "name": "get_member",
+      "description": "Get a specific member by organization ID and user UUID.",
+      "parameters": {
+        "organization_id": "string (UUID)",
+        "user_uuid": "string (UUID)"
+      }
+    },
+    {
+      "name": "invite_member",
+      "description": "Invite a new member to the organization.",
+      "parameters": {
+        "organization_id": "string (UUID)",
+        "email": "string",
+        "level": "string (optional, admin/member)",
+        "first_name": "string (optional)",
+        "last_name": "string (optional)"
+      }
+    },
+    {
+      "name": "update_member",
+      "description": "Update a member's properties by organization ID and user UUID.",
+      "parameters": {
+        "organization_id": "string (UUID)",
+        "user_uuid": "string (UUID)",
+        "level": "string (optional, admin/member)",
+        "first_name": "string (optional)",
+        "last_name": "string (optional)"
+      }
+    },
+    {
+      "name": "remove_member",
+      "description": "Remove a member from the organization by organization ID and user UUID.",
+      "parameters": {
+        "organization_id": "string (UUID)",
+        "user_uuid": "string (UUID)"
+      }
+    },
+    {
+      "name": "get_all_roles",
+      "description": "List all roles in the organization with pagination.",
+      "parameters": {
+        "organization_id": "string (UUID)",
+        "limit": "number (optional, default 100)",
+        "offset": "number (optional)"
+      }
+    },
+    {
+      "name": "get_role",
+      "description": "Get a specific role by organization ID and role ID.",
+      "parameters": {
+        "organization_id": "string (UUID)",
+        "role_id": "number"
+      }
+    },
+    {
+      "name": "create_role",
+      "description": "Create a new role in the organization with access levels.",
+      "parameters": {
+        "organization_id": "string (UUID)",
+        "name": "string",
+        "description": "string (optional)",
+        "feature_flags_access_level": "string (optional, none/read/write)",
+        "cohorts_access_level": "string (optional, none/read/write)",
+        "data_management_access_level": "string (optional, none/read/write)",
+        "experiments_access_level": "string (optional, none/read/write)",
+        "insights_access_level": "string (optional, none/read/write)",
+        "recordings_access_level": "string (optional, none/read/write)",
+        "surveys_access_level": "string (optional, none/read/write)",
+        "feature_flags": "array (optional)",
+        "cohorts": "array (optional)",
+        "experiments": "array (optional)",
+        "insights": "array (optional)",
+        "recordings": "array (optional)",
+        "surveys": "array (optional)"
+      }
+    },
+    {
+      "name": "update_role",
+      "description": "Update a role's properties by organization ID and role ID.",
+      "parameters": {
+        "organization_id": "string (UUID)",
+        "role_id": "number",
+        "name": "string (optional)",
+        "description": "string (optional)",
+        "feature_flags_access_level": "string (optional, none/read/write)",
+        "cohorts_access_level": "string (optional, none/read/write)",
+        "data_management_access_level": "string (optional, none/read/write)",
+        "experiments_access_level": "string (optional, none/read/write)",
+        "insights_access_level": "string (optional, none/read/write)",
+        "recordings_access_level": "string (optional, none/read/write)",
+        "surveys_access_level": "string (optional, none/read/write)",
+        "feature_flags": "array (optional)",
+        "cohorts": "array (optional)",
+        "experiments": "array (optional)",
+        "insights": "array (optional)",
+        "recordings": "array (optional)",
+        "surveys": "array (optional)"
+      }
+    },
+    {
+      "name": "delete_role",
+      "description": "Delete a role by organization ID and role ID.",
+      "parameters": {
+        "organization_id": "string (UUID)",
+        "role_id": "number"
+      }
+    },
+    {
+      "name": "get_web_analytics",
+      "description": "Get web analytics data for the project with filtering options.",
+      "parameters": {
+        "project_id": "number",
+        "date_from": "string (optional, ISO format)",
+        "date_to": "string (optional, ISO format)",
+        "pathname": "string (optional)",
+        "referrer": "string (optional)",
+        "utm_source": "string (optional)",
+        "utm_medium": "string (optional)",
+        "utm_campaign": "string (optional)"
+      }
+    },
+    {
+      "name": "create_web_analytics_event",
+      "description": "Create a new web analytics event with custom properties.",
+      "parameters": {
+        "project_id": "number",
+        "event": "string",
+        "properties": "object (optional)",
+        "timestamp": "string (optional, ISO format)",
+        "distinct_id": "string (optional)",
+        "$set": "object (optional)",
+        "$set_once": "object (optional)"
+      }
+    },
+    {
+      "name": "get_web_analytics_events",
+      "description": "List web analytics events with pagination and filtering.",
+      "parameters": {
+        "project_id": "number",
+        "limit": "number (optional, default 100)",
+        "offset": "number (optional)",
+        "date_from": "string (optional, ISO format)",
+        "date_to": "string (optional, ISO format)",
+        "event": "string (optional)",
+        "pathname": "string (optional)"
+      }
+    },
+    {
+      "name": "get_web_analytics_event",
+      "description": "Get a specific web analytics event by ID.",
+      "parameters": {
+        "project_id": "number",
+        "event_id": "string"
+      }
+    },
+    {
+      "name": "execute_query",
+      "description": "Execute a SQL or HogQL query against the project data.",
+      "parameters": {
+        "project_id": "number",
+        "query": "string",
+        "query_type": "string (optional, sql or hogql)",
+        "refresh": "boolean (optional)",
+        "client_query_id": "string (optional)"
+      }
+    },
+    {
+      "name": "get_query_results",
+      "description": "List query results for the project with pagination and filtering.",
+      "parameters": {
+        "project_id": "number",
+        "limit": "number (optional, default 100)",
+        "offset": "number (optional)",
+        "query_type": "string (optional, sql or hogql)",
+        "status": "string (optional, running/completed/failed)"
+      }
+    },
+    {
+      "name": "get_query_result",
+      "description": "Get a specific query result by ID.",
+      "parameters": {
+        "project_id": "number",
+        "query_id": "string"
+      }
+    },
+    {
+      "name": "get_activity_log",
+      "description": "List activity log entries for the project with pagination and filtering.",
+      "parameters": {
+        "project_id": "number",
+        "limit": "number (optional, default 100)",
+        "offset": "number (optional)",
+        "user_id": "number (optional)",
+        "activity": "string (optional)",
+        "scope": "string (optional)",
+        "item_id": "string (optional)",
+        "date_from": "string (optional, ISO format)",
+        "date_to": "string (optional, ISO format)"
+      }
+    },
+    {
+      "name": "get_activity_log_entry",
+      "description": "Get a specific activity log entry by ID.",
+      "parameters": {
+        "project_id": "number",
+        "log_id": "string"
+      }
+    },
+    {
+      "name": "get_all_environments",
+      "description": "List all environments in the project with pagination.",
+      "parameters": {
+        "project_id": "number",
+        "limit": "number (optional, default 100)",
+        "offset": "number (optional)"
+      }
+    },
+    {
+      "name": "get_environment",
+      "description": "Get a specific environment by ID.",
+      "parameters": {
+        "project_id": "number",
+        "environment_id": "string"
+      }
+    },
+    {
+      "name": "create_environment",
+      "description": "Create a new environment in the project.",
+      "parameters": {
+        "project_id": "number",
+        "name": "string",
+        "description": "string (optional)",
+        "color": "string (optional, hex code)",
+        "enabled": "boolean (optional)"
+      }
+    },
+    {
+      "name": "update_environment",
+      "description": "Update an existing environment in the project.",
+      "parameters": {
+        "project_id": "number",
+        "environment_id": "string",
+        "name": "string (optional)",
+        "description": "string (optional)",
+        "color": "string (optional, hex code)",
+        "enabled": "boolean (optional)"
+      }
+    },
+    {
+      "name": "delete_environment",
+      "description": "Delete an environment from the project.",
+      "parameters": {
+        "project_id": "number",
+        "environment_id": "string"
+      }
+    },
+    {
+      "name": "get_all_hog_functions",
+      "description": "List all hog functions in the project with pagination.",
+      "parameters": {
+        "project_id": "number",
+        "limit": "number (optional, default 100)",
+        "offset": "number (optional)"
+      }
+    },
+    {
+      "name": "get_hog_function",
+      "description": "Get a specific hog function by ID.",
+      "parameters": {
+        "project_id": "number",
+        "function_id": "string"
+      }
+    },
+    {
+      "name": "create_hog_function",
+      "description": "Create a new hog function in the project.",
+      "parameters": {
+        "project_id": "number",
+        "name": "string",
+        "description": "string (optional)",
+        "code": "string",
+        "enabled": "boolean (optional)",
+        "inputs_schema": "object (optional)",
+        "output_schema": "object (optional)"
+      }
+    },
+    {
+      "name": "update_hog_function",
+      "description": "Update an existing hog function in the project.",
+      "parameters": {
+        "project_id": "number",
+        "function_id": "string",
+        "name": "string (optional)",
+        "description": "string (optional)",
+        "code": "string (optional)",
+        "enabled": "boolean (optional)",
+        "inputs_schema": "object (optional)",
+        "output_schema": "object (optional)"
+      }
+    },
+    {
+      "name": "delete_hog_function",
+      "description": "Delete a hog function from the project.",
+      "parameters": {
+        "project_id": "number",
+        "function_id": "string"
+      }
+    },
+    {
+      "name": "get_all_session_recording_playlists",
+      "description": "List all session recording playlists in the project with pagination.",
+      "parameters": {
+        "project_id": "number",
+        "limit": "number (optional, default 100)",
+        "offset": "number (optional)"
+      }
+    },
+    {
+      "name": "get_session_recording_playlist",
+      "description": "Get a specific session recording playlist by ID.",
+      "parameters": {
+        "project_id": "number",
+        "playlist_id": "string"
+      }
+    },
+    {
+      "name": "create_session_recording_playlist",
+      "description": "Create a new session recording playlist in the project.",
+      "parameters": {
+        "project_id": "number",
+        "name": "string",
+        "description": "string (optional)",
+        "filters": "object (optional)",
+        "derived_name": "string (optional)",
+        "short_id": "string (optional)"
+      }
+    },
+    {
+      "name": "update_session_recording_playlist",
+      "description": "Update an existing session recording playlist in the project.",
+      "parameters": {
+        "project_id": "number",
+        "playlist_id": "string",
+        "name": "string (optional)",
+        "description": "string (optional)",
+        "filters": "object (optional)",
+        "derived_name": "string (optional)",
+        "short_id": "string (optional)"
+      }
+    },
+    {
+      "name": "delete_session_recording_playlist",
+      "description": "Delete a session recording playlist from the project.",
+      "parameters": {
+        "project_id": "number",
+        "playlist_id": "string"
+      }
+    }
+  ]
+}

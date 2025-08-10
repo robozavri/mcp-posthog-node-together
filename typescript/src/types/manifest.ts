@@ -1,0 +1,377 @@
+/**
+ * TypeScript interfaces for the PostHog MCP Server manifest
+ */
+
+export interface ToolSchema {
+  type: "object";
+  properties: Record<string, {
+    type: string;
+    enum?: string[];
+    default?: any;
+    description: string;
+  }>;
+  required?: string[];
+}
+
+export interface ToolDefinition {
+  name: string;
+  description: string;
+  inputSchema: ToolSchema;
+}
+
+export interface ToolsCapability {
+  description: string;
+  tools: ToolDefinition[];
+}
+
+export interface ConfigurationField {
+  type: string;
+  description: string;
+}
+
+export interface Configuration {
+  required: Record<string, ConfigurationField>;
+  optional: Record<string, ConfigurationField>;
+}
+
+export interface Features {
+  analytics: Record<string, string>;
+  data_processing: Record<string, string>;
+  time_periods: {
+    predefined: string[];
+    custom: string;
+  };
+  filtering: Record<string, string>;
+  pagination: Record<string, string>;
+}
+
+export interface Example {
+  tool: string;
+  parameters: Record<string, any>;
+  description: string;
+}
+
+export interface Examples {
+  basic_active_users: Example;
+  retention_analysis: Example;
+  page_views_with_filter: Example;
+  user_behavior_analysis: Example;
+}
+
+export interface Endpoints {
+  sse: string;
+  messages: string;
+}
+
+export interface Dependencies {
+  "@modelcontextprotocol/sdk": string;
+  zod: string;
+  express: string;
+}
+
+export interface Development {
+  build: string;
+  start: string;
+  test: string;
+}
+
+export interface Capabilities {
+  tools: ToolsCapability;
+}
+
+export interface MCPManifest {
+  name: string;
+  version: string;
+  description: string;
+  author: string;
+  license: string;
+  repository: {
+    type: string;
+    url: string;
+  };
+  keywords: string[];
+  capabilities: Capabilities;
+  configuration: Configuration;
+  features: Features;
+  examples: Examples;
+  endpoints: Endpoints;
+  dependencies: Dependencies;
+  development: Development;
+}
+
+/**
+ * Default manifest configuration
+ */
+export const DEFAULT_MANIFEST: MCPManifest = {
+  name: "PostHog MCP Server",
+  version: "1.0.0",
+  description: "Model Context Protocol server for PostHog analytics and user behavior analysis",
+  author: "PostHog MCP Team",
+  license: "MIT",
+  repository: {
+    type: "git",
+    url: "https://github.com/posthog/mcp-posthog-node-server"
+  },
+  keywords: [
+    "mcp",
+    "posthog",
+    "analytics",
+    "user-behavior",
+    "retention",
+    "page-views",
+    "active-users"
+  ],
+  capabilities: {
+    tools: {
+      description: "PostHog analytics tools for comprehensive user behavior analysis",
+      tools: [
+        {
+          name: "get-active-users",
+          description: "Retrieve daily or weekly active users from PostHog",
+          inputSchema: {
+            type: "object",
+            properties: {
+              interval: {
+                type: "string",
+                enum: ["daily", "weekly"],
+                description: "Time interval for active users (daily or weekly)"
+              },
+              limit: {
+                type: "number",
+                default: 30,
+                description: "Number of results to return (default: 30)"
+              }
+            },
+            required: ["interval"]
+          }
+        },
+        {
+          name: "get-retention",
+          description: "Analyze user retention patterns with cohort analysis",
+          inputSchema: {
+            type: "object",
+            properties: {
+              period: {
+                type: "string",
+                enum: ["day", "week", "month"],
+                description: "Retention period (day, week, or month) - REQUIRED"
+              },
+              date_range: {
+                type: "number",
+                default: 30,
+                description: "Number of periods to analyze (default: 30)"
+              },
+              event_name: {
+                type: "string",
+                description: "Specific event name to analyze retention for (optional)"
+              }
+            },
+            required: ["period"]
+          }
+        },
+        {
+          name: "get-page-views",
+          description: "Retrieve comprehensive page view statistics from PostHog",
+          inputSchema: {
+            type: "object",
+            properties: {
+              period: {
+                type: "string",
+                enum: ["last_7_days", "last_30_days", "last_90_days", "last_180_days", "last_365_days"],
+                description: "Predefined time period (if not provided, start_date and end_date are required)"
+              },
+              start_date: {
+                type: "string",
+                description: "Start date in YYYY-MM-DD format (e.g., '2024-01-01') - required if period is not specified"
+              },
+              end_date: {
+                type: "string",
+                description: "End date in YYYY-MM-DD format (e.g., '2024-01-31') - required if period is not specified"
+              },
+              limit: {
+                type: "number",
+                default: 50,
+                description: "Number of results to return (default: 50)"
+              },
+              offset: {
+                type: "number",
+                default: 0,
+                description: "Number of results to skip (default: 0)"
+              },
+              filter: {
+                type: "string",
+                description: "Optional filter for specific path or URL (e.g., '/blog', '/product')"
+              }
+            }
+          }
+        },
+        {
+          name: "get-detailed-page-views",
+          description: "Retrieve detailed page view statistics with advanced metrics including bounce rate and session duration",
+          inputSchema: {
+            type: "object",
+            properties: {
+              period: {
+                type: "string",
+                enum: ["last_7_days", "last_30_days", "last_90_days", "last_180_days", "last_365_days"],
+                description: "Predefined time period (if not provided, start_date and end_date are required)"
+              },
+              start_date: {
+                type: "string",
+                description: "Start date in YYYY-MM-DD format (e.g., '2024-01-01') - required if period is not specified"
+              },
+              end_date: {
+                type: "string",
+                description: "End date in YYYY-MM-DD format (e.g., '2024-01-31') - required if period is not specified"
+              },
+              limit: {
+                type: "number",
+                default: 50,
+                description: "Number of results to return (default: 50)"
+              },
+              offset: {
+                type: "number",
+                default: 0,
+                description: "Number of results to skip (default: 0)"
+              },
+              filter: {
+                type: "string",
+                description: "Optional filter for specific path or URL (e.g., '/blog', '/product')"
+              }
+            }
+          }
+        },
+        {
+          name: "get-user-behavior",
+          description: "Retrieve comprehensive user behavior analytics including session duration, bounce rate, and engagement metrics",
+          inputSchema: {
+            type: "object",
+            properties: {
+              period: {
+                type: "string",
+                enum: ["last_7_days", "last_30_days", "last_90_days", "last_180_days", "last_365_days"],
+                description: "Predefined time period (if not provided, start_date and end_date are required)"
+              },
+              start_date: {
+                type: "string",
+                description: "Start date in YYYY-MM-DD format (e.g., '2024-01-01') - required if period is not specified"
+              },
+              end_date: {
+                type: "string",
+                description: "End date in YYYY-MM-DD format (e.g., '2024-01-31') - required if period is not specified"
+              },
+              limit: {
+                type: "number",
+                default: 50,
+                description: "Number of results to return (default: 50)"
+              },
+              offset: {
+                type: "number",
+                default: 0,
+                description: "Number of results to skip (default: 0)"
+              },
+              filter: {
+                type: "string",
+                description: "Optional filter for specific path or URL (e.g., '/blog', '/product')"
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  configuration: {
+    required: {
+      apiToken: {
+        type: "string",
+        description: "PostHog API token for authentication"
+      }
+    },
+    optional: {
+      projectId: {
+        type: "string",
+        description: "PostHog project ID (will be auto-detected if not provided)"
+      },
+      orgId: {
+        type: "string",
+        description: "PostHog organization ID (will be auto-detected if not provided)"
+      }
+    }
+  },
+  features: {
+    analytics: {
+      active_users: "Track daily and weekly active users",
+      retention: "Analyze user retention patterns with cohort analysis",
+      page_views: "Comprehensive page view statistics and user navigation",
+      detailed_page_views: "Advanced page analytics with bounce rate and session duration",
+      user_behavior: "Comprehensive user behavior analytics and engagement metrics"
+    },
+    data_processing: {
+      hogql_queries: "Uses PostHog's HogQL for efficient data queries",
+      session_analysis: "Session duration and bounce rate calculations",
+      user_segmentation: "User behavior analysis and segmentation",
+      cohort_analysis: "Retention analysis with cohort tracking"
+    },
+    time_periods: {
+      predefined: ["last_7_days", "last_30_days", "last_90_days", "last_180_days", "last_365_days"],
+      custom: "Support for custom date ranges in YYYY-MM-DD format"
+    },
+    filtering: {
+      path_based: "Filter analysis by specific paths or URLs",
+      event_specific: "Analyze retention for specific events"
+    },
+    pagination: {
+      limit: "Control number of results returned",
+      offset: "Skip results for pagination"
+    }
+  },
+  examples: {
+    basic_active_users: {
+      tool: "get-active-users",
+      parameters: {
+        interval: "daily",
+        limit: 30
+      },
+      description: "Get daily active users for the last 30 days"
+    },
+    retention_analysis: {
+      tool: "get-retention",
+      parameters: {
+        period: "week",
+        date_range: 12
+      },
+      description: "Analyze weekly retention for the last 12 weeks"
+    },
+    page_views_with_filter: {
+      tool: "get-page-views",
+      parameters: {
+        period: "last_30_days",
+        filter: "/blog",
+        limit: 20
+      },
+      description: "Get page views for blog section in the last 30 days"
+    },
+    user_behavior_analysis: {
+      tool: "get-user-behavior",
+      parameters: {
+        period: "last_30_days",
+        limit: 50
+      },
+      description: "Analyze user behavior patterns for the last 30 days"
+    }
+  },
+  endpoints: {
+    sse: "/mcp/events",
+    messages: "/mcp/messages"
+  },
+  dependencies: {
+    "@modelcontextprotocol/sdk": "^0.4.0",
+    zod: "^3.22.0",
+    express: "^4.18.0"
+  },
+  development: {
+    build: "npm run build",
+    start: "npm start",
+    test: "npm test"
+  }
+}; 
