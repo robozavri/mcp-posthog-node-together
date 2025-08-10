@@ -102,8 +102,8 @@ export function validateManifest(manifest: any): boolean {
 }
 
 /**
- * Get manifest endpoint handler for Express
- * @returns Express middleware function
+ * Get manifest endpoint handler for Node.js HTTP
+ * @returns HTTP handler function
  */
 export function getManifestHandler() {
   return (req: any, res: any) => {
@@ -114,15 +114,18 @@ export function getManifestHandler() {
       res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
       if (req.method === 'OPTIONS') {
-        res.status(200).end();
+        res.writeHead(200);
+        res.end();
         return;
       }
 
       const manifest = getManifest();
-      res.status(200).json(manifest);
+      res.writeHead(200);
+      res.end(JSON.stringify(manifest));
     } catch (error) {
       console.error('Error serving manifest:', error);
-      res.status(500).json({ error: 'Failed to serve manifest' });
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Failed to serve manifest' }));
     }
   };
 }

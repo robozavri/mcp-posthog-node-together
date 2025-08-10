@@ -26,9 +26,28 @@ async function main() {
         // Create an HTTP server
         const httpServer = http.createServer(async (req, res) => {
             console.log('req.headers: ', req.headers);
+            const requestUrl = new URL(req.url || "", `http://${req.headers.host}`);
+            
+            // Handle health check and manifest without authentication
+            if (req.method === "GET" && requestUrl.pathname === "/manifest") {
+                const manifestHandler = getManifestHandler();
+                manifestHandler(req, res);
+                return;
+            }
+            
+            if (req.method === "GET" && requestUrl.pathname === "/") {
+                res.writeHead(200, { "Content-Type": "text/plain" });
+                res.end(`MCP Server is running! SSE at ${SSE_ENDPOINT}, POST to ${MESSAGE_ENDPOINT_BASE}?sessionId=...`);
+                return;
+            }
+            
+            // Check authentication for MCP endpoints
             const token = req.headers.authorization?.split(" ")[1];
             if (!token) {
-                throw new Error("Missing Bearer token"); 
+                console.log('[HTTP] Missing Bearer token for MCP endpoint');
+                res.writeHead(401, { "Content-Type": "text/plain" });
+                res.end("Missing Bearer token");
+                return;
             }
             const userHash = crypto.createHash("sha256").update(token).digest("hex");
 
@@ -37,8 +56,6 @@ async function main() {
             const server = mcp.server;
 
             console.log(`[HTTP] is listening on port ${PORT} for ${req.method} ${req.url}`);
-
-            const requestUrl = new URL(req.url || "", `http://${req.headers.host}`);
 
             if (req.method === "GET" && requestUrl.pathname === "/manifest") {
                 // Serve the MCP manifest

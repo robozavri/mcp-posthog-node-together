@@ -1,0 +1,47 @@
+# Caddy configuration for MCP Server reverse proxy
+
+# MCP Server endpoint
+mcp.yourdomain.com {
+    reverse_proxy mcp-server:3000 {
+        header_up Host {host}
+        header_up X-Real-IP {remote}
+        header_up X-Forwarded-For {remote}
+        header_up X-Forwarded-Proto {scheme}
+    }
+    
+    # Enable CORS for MCP client connections
+    header {
+        Access-Control-Allow-Origin *
+        Access-Control-Allow-Methods "GET, POST, OPTIONS"
+        Access-Control-Allow-Headers "Content-Type, Authorization"
+        Access-Control-Allow-Credentials true
+    }
+    
+    # Handle preflight requests
+    @options {
+        method OPTIONS
+    }
+    respond @options 200
+}
+
+# Alternative: Use a subpath on your main domain
+# yourdomain.com/mcp {
+#     reverse_proxy mcp-server:3000 {
+#         header_up Host {host}
+#         header_up X-Real-IP {remote}
+#         header_up X-Forwarded-For {remote}
+#         header_up X-Forwarded-Proto {scheme}
+#     }
+#     
+#     header {
+#         Access-Control-Allow-Origin *
+#         Access-Control-Allow-Methods "GET, POST, OPTIONS"
+#         Access-Control-Allow-Headers "Content-Type, Authorization"
+#         Access-Control-Allow-Credentials true
+#     }
+#     
+#     @options {
+#         method OPTIONS
+#     }
+#     respond @options 200
+# }
