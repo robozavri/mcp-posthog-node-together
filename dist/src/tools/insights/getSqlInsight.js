@@ -1,0 +1,39 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getSqlInsightHandler = void 0;
+const tool_inputs_1 = require("@/schema/tool-inputs");
+const schema = tool_inputs_1.InsightGetSqlSchema;
+const getSqlInsightHandler = async (context, params) => {
+    const { query } = params;
+    const projectId = await context.getProjectId();
+    const result = await context.api.insights({ projectId }).sqlInsight({ query });
+    if (!result.success) {
+        throw new Error(`Failed to execute SQL insight: ${result.error.message}`);
+    }
+    if (result.data.length === 0) {
+        return {
+            content: [
+                {
+                    type: "text",
+                    text: "Received an empty SQL insight or no data in the stream.",
+                },
+            ],
+        };
+    }
+    return { content: [{ type: "text", text: JSON.stringify(result.data) }] };
+};
+exports.getSqlInsightHandler = getSqlInsightHandler;
+const tool = () => ({
+    name: "get-sql-insight",
+    description: `
+        - Queries project's PostHog data warehouse based on a provided natural language question - don't provide SQL query as input but describe the output you want.
+        - Data warehouse schema includes data like events and persons.
+        - Use this tool to get a quick answer to a question about the data in the project, which can't be answered using other, more dedicated tools.
+        - Fetches the result as a Server-Sent Events (SSE) stream and provides the concatenated data content.
+        - When giving the results back to the user, first show the SQL query that was used, then briefly explain the query, then provide results in reasily readable format.
+        - You should also offer to save the query as an insight if the user wants to.
+    `,
+    schema,
+    handler: exports.getSqlInsightHandler,
+});
+exports.default = tool;
